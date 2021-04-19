@@ -4,7 +4,7 @@
 
 ## Descrição
 
-Neste projeto, vou tentar fazer um minigame do zero, usando a placa ESP32.
+Neste projeto, vou tentar montar e programar um minigame do zero, usando a placa ESP32, um visor OLED, um potenciômetro e um buzzer.
 
 ## Componentes
 
