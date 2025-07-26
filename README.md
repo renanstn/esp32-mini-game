@@ -6,14 +6,13 @@
 
 ## Descrição
 
-Neste projeto, montei e programei um minigame do zero.
+Neste projeto, montei e programei um minigame do zero, em uma placa ESP32.
 
-## Componentes
+## Componentes principais
 
 - Placa ESP32
 - Visor OLED
 - Potenciômetro 10k
-- Buzzer
 
 ## Schema
 
