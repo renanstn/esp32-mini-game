@@ -15,6 +15,10 @@ Neste projeto, montei e programei um minigame do zero.
 - Potenciômetro 10k
 - Buzzer
 
+## Schema
+
+![](images/schema.png)
+
 ## Referências
 
 - https://randomnerdtutorials.com/esp32-adc-analog-read-arduino-ide/
