@@ -94,7 +94,7 @@ void loop()
   // Calc player position
   player_position = (int)map(potentiometer_read, 4095, 0, 0, SCREEN_WIDTH - PLAYER_WIDTH - 1);
 
-  // Limita a posição do player dentro da pista
+  // Limit player position in the road
   player_position = constrain(player_position, 10, display.width()-1-PLAYER_WIDTH-10);
   display.clearDisplay();
 
