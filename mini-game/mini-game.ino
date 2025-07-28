@@ -75,28 +75,18 @@ void setupRoadDetails() {
   obstacles[3] = RoadItem{80, 16, false};
 }
 
-void setup()
-{
-  Serial.begin(9600);
-  setupDisplay();
-  setupRoadDetails();
+int getPlayerPosition(int potentiometerRead) {
+  // Map player position and keep the player inside the road
+  int calculatedPosition = (int)map(potentiometerRead, 0, 4095, 0, SCREEN_WIDTH - PLAYER_WIDTH - 1);
+  int constrainedPosition = constrain(playerPosition, 10, display.width()-1-PLAYER_WIDTH-10);
+  return constrainedPosition;
 }
 
-
-void loop()
-{
-  potentiometerRead = analogRead(A0);
-
-  // Calculate player position
-  playerPosition = (int)map(potentiometerRead, 0, 4095, 0, SCREEN_WIDTH - PLAYER_WIDTH - 1);
-
-  // Limit player position in the road
-  playerPosition = constrain(playerPosition, 10, display.width()-1-PLAYER_WIDTH-10);
-  display.clearDisplay();
-
-  // Draw player
+void drawPlayer(int playerPosition) {
   display.drawBitmap(playerPosition, PLAYER_Y_POSITION, player, PLAYER_WIDTH, PLAYER_HEIGHT, WHITE);
+}
 
+void drawRoad() {
   // Draw extern road line
   display.drawLine(30, 16, 0, display.height()-1, WHITE);
   display.drawLine(display.width()-30-1, 16, display.width()-1, display.height()-1, WHITE);
@@ -122,15 +112,17 @@ void loop()
       rightRoadDetails[i].x = calculateXPositionOfRoadDetail(rightRoadDetails[i].y, 'r');
     }
   }
+}
 
-  // Spawn obstacles every X miliseconds
+void spawnObstacles() {
   if (millis() - lastMillis > spawnTime) {
     lastMillis = millis();
     // Select a random obstacle to activate
     obstacles[random(0, 4)].active = true;
   }
+}
 
-  // Move obstacles
+void moveObstacles() {
   for (int i=0; i<4; i++) {
     if (!obstacles[i].active) {
       continue;
@@ -147,20 +139,40 @@ void loop()
       }
     }
   }
+}
 
-  // Draw obstacles
+void drawObstacles() {
   for (int i=0; i<4; i++) {
     if (!obstacles[i].active) {
       continue;
     }
     display.drawBitmap(obstacles[i].x, obstacles[i].y, player, PLAYER_WIDTH, PLAYER_HEIGHT, WHITE);
   }
+}
 
-  // Draw Score
+void drawScore() {
   display.setCursor(0, 0);
   display.print("Score: " + String(score));
+}
 
-  // Render the buffer
+void setup()
+{
+  Serial.begin(9600);
+  setupDisplay();
+  setupRoadDetails();
+}
+
+void loop()
+{
+  potentiometerRead = analogRead(A0);
+  playerPosition = getPlayerPosition(potentiometerRead);
+  display.clearDisplay();
+  drawPlayer(playerPosition);
+  drawRoad();
+  spawnObstacles();
+  moveObstacles();
+  drawObstacles();
+  drawScore();
   display.display();
   delay(15);
 }
