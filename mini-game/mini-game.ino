@@ -88,7 +88,7 @@ void loop()
   potentiometerRead = analogRead(A0);
 
   // Calculate player position
-  playerPosition = (int)map(potentiometerRead, 4095, 0, 0, SCREEN_WIDTH - PLAYER_WIDTH - 1);
+  playerPosition = (int)map(potentiometerRead, 0, 4095, 0, SCREEN_WIDTH - PLAYER_WIDTH - 1);
 
   // Limit player position in the road
   playerPosition = constrain(playerPosition, 10, display.width()-1-PLAYER_WIDTH-10);
