@@ -8,6 +8,7 @@
 #define PLAYER_HEIGHT 8
 #define PLAYER_Y_POSITION 50
 #define BUZZER_PIN 18
+#define POTENTIOMETER_PIN 36
 
 static const unsigned char PROGMEM player[] = {
   B00011000,
@@ -78,14 +79,18 @@ void setupObstacles() {
 }
 
 int getPlayerPosition(int potentiometerRead) {
-  // Map player position and keep the player inside the road
-  int calculatedPosition = (int)map(potentiometerRead, 0, 4095, 0, SCREEN_WIDTH - PLAYER_WIDTH - 1);
-  int constrainedPosition = constrain(playerPosition, 10, display.width()-1-PLAYER_WIDTH-10);
-  return constrainedPosition;
+  return (int)map(potentiometerRead, 0, 4095, 0, SCREEN_WIDTH - PLAYER_WIDTH - 1);
 }
 
 void drawPlayer(int playerPosition) {
-  display.drawBitmap(playerPosition, PLAYER_Y_POSITION, player, PLAYER_WIDTH, PLAYER_HEIGHT, WHITE);
+  display.drawBitmap(
+    playerPosition, 
+    PLAYER_Y_POSITION, 
+    player, 
+    PLAYER_WIDTH, 
+    PLAYER_HEIGHT, 
+    WHITE
+  );
 }
 
 void drawRoad() {
@@ -172,14 +177,21 @@ bool checkCollisionWithObstacles(int playerPosition) {
 }
 
 void gameOver() {
-  display.setCursor(0, 0);
-  display.print("You crashed! Game over!");
+  display.clearDisplay();
+  drawScore();
+  display.setCursor(0, 16);
+  display.print("* * * Game over * * *");
+  display.setCursor(0, 32);
+  display.print("Press reset button");
+  display.setCursor(0, 40);
+  display.print("to try again.");
+  display.display();
   for(;;);
 }
 
 void setup()
 {
-  Serial.begin(9600);
+  // Serial.begin(9600);
   setupDisplay();
   setupRoadDetails();
   setupObstacles();
@@ -187,8 +199,9 @@ void setup()
 
 void loop()
 {
-  potentiometerRead = analogRead(A0);
+  potentiometerRead = analogRead(POTENTIOMETER_PIN);
   playerPosition = getPlayerPosition(potentiometerRead);
+  playerPosition = constrain(playerPosition, 10, display.width()-1-PLAYER_WIDTH-10);
   display.clearDisplay();
   drawPlayer(playerPosition);
   drawRoad();
