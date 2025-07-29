@@ -31,6 +31,7 @@ int playerPosition;
 int score = 0;
 int spawnTime = 2000;
 int obstaclesSpeed = 2;
+bool hit = false;
 unsigned long lastMillis = 0;
 RoadItem leftRoadDetails[3];
 RoadItem rightRoadDetails[3];
@@ -38,8 +39,7 @@ RoadItem obstacles[4];
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
-int calculateXPositionOfRoadDetail(int yPosition, char side)
-{
+int calculateXPositionOfRoadDetail(int yPosition, char side) {
   int result;
   if (side == 'l') {
     result = map(yPosition, 16, SCREEN_HEIGHT, 36, 0+6);
@@ -68,7 +68,9 @@ void setupRoadDetails() {
   rightRoadDetails[0] = RoadItem{calculateXPositionOfRoadDetail(16, 'r'), 16, true};
   rightRoadDetails[1] = RoadItem{calculateXPositionOfRoadDetail(32, 'r'), 32, true};
   rightRoadDetails[2] = RoadItem{calculateXPositionOfRoadDetail(48, 'r'), 48, true};
+}
 
+void setupObstacles() {
   obstacles[0] = RoadItem{32, 16, false};
   obstacles[1] = RoadItem{48, 16, false};
   obstacles[2] = RoadItem{64, 16, false};
@@ -155,11 +157,32 @@ void drawScore() {
   display.print("Score: " + String(score));
 }
 
+bool isColliding(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
+  return !(x1 + w1 <= x2 || x2 + w2 <= x1 || y1 + h1 <= y2 || y2 + h2 <= y1);
+}
+
+bool checkCollisionWithObstacles(int playerPosition) {
+  for (int i=0; i<4; i++) {
+    RoadItem obstacle = obstacles[i];
+    if (isColliding(playerPosition, PLAYER_Y_POSITION, PLAYER_WIDTH, PLAYER_HEIGHT, obstacle.x, obstacle.y, PLAYER_WIDTH, PLAYER_HEIGHT)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void gameOver() {
+  display.setCursor(0, 0);
+  display.print("You crashed! Game over!");
+  for(;;);
+}
+
 void setup()
 {
   Serial.begin(9600);
   setupDisplay();
   setupRoadDetails();
+  setupObstacles();
 }
 
 void loop()
@@ -171,6 +194,10 @@ void loop()
   drawRoad();
   spawnObstacles();
   moveObstacles();
+  hit = checkCollisionWithObstacles(playerPosition);
+  if (hit) {
+    gameOver();
+  }
   drawObstacles();
   drawScore();
   display.display();
